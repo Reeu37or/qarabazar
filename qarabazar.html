@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QARABAZAR.KZ — Актау</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0000; color: #ff2222; font-family: 'Courier New', monospace; padding: 20px; min-height: 100vh; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 10px; border-bottom: 2px solid #ff2222; flex-wrap: wrap; gap: 10px; }
+        .header-left { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .header h1 { font-size: 2rem; color: #ff2222; text-shadow: 0 0 30px #ff000066; letter-spacing: 3px; margin: 0; }
+        .telegram-link { display: flex; align-items: center; gap: 8px; color: #ff4444; text-decoration: none; font-size: 0.95rem; border: 1px solid #661111; padding: 6px 14px; border-radius: 30px; background: #1a0505; transition: 0.3s; white-space: nowrap; }
+        .telegram-link:hover { background: #ff2222; color: #0a0000; border-color: #ff2222; }
+        .telegram-link svg { width: 24px; height: 24px; fill: #ff4444; transition: 0.3s; flex-shrink: 0; }
+        .telegram-link:hover svg { fill: #0a0000; }
+        .warning { color: #ff6666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; width: 100%; text-align: center; margin-top: 5px; }
+        .nav { display: flex; justify-content: center; gap: 20px; margin: 20px 0; flex-wrap: wrap; }
+        .nav a { color: #ff2222; text-decoration: none; border: 1px solid #ff2222; padding: 8px 25px; border-radius: 3px; transition: 0.3s; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+        .nav a:hover { background: #ff2222; color: #0a0000; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .search-box { display: flex; justify-content: center; margin: 20px 0; }
+        .search-box input { width: 80%; max-width: 500px; padding: 12px 20px; background: #1a0505; color: #ff2222; border: 1px solid #ff2222; border-radius: 3px; font-size: 1rem; outline: none; }
+        .search-box input::placeholder { color: #661111; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 20px 0; }
+        .product-card { background: #0d0202; border: 1px solid #ff2222; border-radius: 5px; padding: 15px; transition: 0.3s; }
+        .product-card:hover { transform: scale(1.02); box-shadow: 0 0 30px #ff000033; }
+        .product-card img { width: 100%; height: 200px; object-fit: cover; border-radius: 3px; background: #1a0505; border: 1px solid #441111; }
+        .product-card h3 { margin: 10px 0 5px; font-size: 1.2rem; color: #ff4444; }
+        .product-card .price { color: #ff8800; font-size: 1.3rem; }
+        .product-card .location { color: #994444; font-size: 0.9rem; }
+        .product-card .hashtags { color: #cc5555; font-size: 0.8rem; margin-top: 5px; }
+        .product-card .category { color: #882222; font-size: 0.8rem; margin-top: 3px; text-transform: uppercase; }
+        .form-container { max-width: 600px; margin: 0 auto; background: #0d0202; padding: 30px; border-radius: 5px; border: 1px solid #ff2222; }
+        .form-container h2 { color: #ff2222; margin-bottom: 15px; text-align: center; letter-spacing: 2px; }
+        .form-container input, .form-container textarea, .form-container select { width: 100%; padding: 12px; margin: 8px 0; background: #1a0505; color: #ff2222; border: 1px solid #441111; border-radius: 3px; font-size: 1rem; outline: none; }
+        .form-container input::placeholder, .form-container textarea::placeholder { color: #661111; }
+        .form-container select option { background: #0d0202; color: #ff2222; }
+        .form-container button { background: #ff2222; color: #0a0000; padding: 12px; border: none; border-radius: 3px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+        .form-container button:hover { background: #ff4444; }
+        .empty-message { text-align: center; color: #661111; padding: 40px 0; font-size: 1.2rem; }
+        .footer { text-align: center; margin-top: 40px; padding: 20px; border-top: 1px solid #441111; color: #661111; font-size: 0.8rem; }
+        .loading { text-align: center; color: #ff4444; padding: 40px 0; font-size: 1.5rem; }
+        @media (max-width: 600px) {
+            .header { flex-direction: column; align-items: flex-start; }
+            .header h1 { font-size: 1.5rem; }
+            .telegram-link { font-size: 0.8rem; padding: 4px 10px; }
+            .telegram-link svg { width: 20px; height: 20px; }
+            .nav a { padding: 6px 15px; font-size: 0.8rem; }
+            .products-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-left">
+            <h1>QARABAZAR.KZ</h1>
+            <a href="https://t.me/qarabazarTOR" target="_blank" class="telegram-link">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                </svg>
+                <span>ПО ВОПРОСАМ В ЛС</span>
+            </a>
+        </div>
+        <div class="warning">ДОСТУП ТОЛЬКО ЧЕРЕЗ VPN / TOR</div>
+    </div>
+
+    <!-- NAV -->
+    <div class="nav">
+        <a onclick="showPage('catalog')">КАТАЛОГ</a>
+        <a onclick="showPage('add')">ДОБАВИТЬ ТОВАР</a>
+    </div>
+    <div class="search-box">
+        <input id="searchInput" placeholder="ПОИСК ПО ХЕШТЕГАМ  #ОРУЖИЕ  #НАРКОТИКИ" oninput="filterProducts()">
+    </div>
+
+    <!-- CATALOG -->
+    <div id="page-catalog" class="page active">
+        <div id="catalog" class="products-grid">
+            <div class="loading">ЗАГРУЗКА ТОВАРОВ...</div>
+        </div>
+    </div>
+
+    <!-- ADD PRODUCT -->
+    <div id="page-add" class="page">
+        <div class="form-container">
+            <h2>НОВЫЙ ТОВАР</h2>
+            <input id="productTitle" placeholder="НАЗВАНИЕ ТОВАРА">
+            <input id="productPrice" placeholder="ЦЕНА (НАПРИМЕР: 4000 ТГ)">
+            <input id="productLocation" placeholder="РАЙОН (НАПРИМЕР: 29 МКР)">
+            <input id="productHashtags" placeholder="ХЕШТЕГИ ЧЕРЕЗ ПРОБЕЛ  #ОРУЖИЕ  #НАРКОТИКИ">
+            <select id="productCategory">
+                <option value="ЛЕГАЛ">ЛЕГАЛ</option>
+                <option value="НЕЛЕГАЛ">НЕЛЕГАЛ</option>
+            </select>
+            <textarea id="productDescription" placeholder="ОПИСАНИЕ ТОВАРА" rows="3"></textarea>
+            <input type="file" id="productImage" accept="image/*">
+            <button onclick="addProduct()">ОПУБЛИКОВАТЬ</button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">QARABAZAR.KZ 2026 | АКТАУ</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // ======== ТВОИ ДАННЫЕ (ОБНОВЛЕННЫЙ КЛЮЧ) ========
+        const SUPABASE_URL = 'https://romantop90gmailcomsproject.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_KFtrOD0qEePx5FCjgth4RA_UOI1A751';
+
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const TABLE_NAME = 'products';
+
+        // ======== ПОКАЗ СТРАНИЦ ========
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+            if (page === 'catalog') loadProducts();
+        }
+
+        // ======== ЗАГРУЗКА ТОВАРОВ ========
+        async function loadProducts() {
+            const container = document.getElementById('catalog');
+            container.innerHTML = '<div class="loading">ЗАГРУЗКА...</div>';
+
+            const { data, error } = await supabase
+                .from(TABLE_NAME)
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Ошибка загрузки:', error);
+                container.innerHTML = '<div class="empty-message">ОШИБКА ЗАГРУЗКИ. ПРОВЕРЬ НАСТРОЙКИ.</div>';
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="empty-message">ТОВАРОВ ПОКА НЕТ. БУДЬ ПЕРВЫМ!</div>';
+                return;
+            }
+
+            window.allProducts = data;
+            renderCatalog(data);
+        }
+
+        // ======== ОТРИСОВКА ========
+        function renderCatalog(products, filter = '') {
+            const container = document.getElementById('catalog');
+            let filtered = products;
+            if (filter) {
+                filtered = products.filter(p =>
+                    (p.hashtags && p.hashtags.toLowerCase().includes(filter.toLowerCase())) ||
+                    (p.title && p.title.toLowerCase().includes(filter.toLowerCase()))
+                );
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-message">НИЧЕГО НЕ НАЙДЕНО</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            filtered.forEach(p => {
+                container.innerHTML += `
+                    <div class="product-card">
+                        ${p.image ? `<img src="${p.image}" alt="${p.title}">` : '<div style="height:200px;background:#1a0505;border-radius:3px;border:1px solid #441111;display:flex;align-items:center;justify-content:center;color:#661111;">НЕТ ФОТО</div>'}
+                        <h3>${p.title || 'БЕЗ НАЗВАНИЯ'}</h3>
+                        <div class="price">${p.price || '0'}</div>
+                        <div class="location">${p.location || 'НЕ УКАЗАН'}</div>
+                        <div class="hashtags">${p.hashtags || ''}</div>
+                        <div class="category">${p.category || 'ЛЕГАЛ'}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // ======== ПОИСК ========
+        async function filterProducts() {
+            const query = document.getElementById('searchInput').value;
+            if (!window.allProducts) {
+                await loadProducts();
+            }
+            renderCatalog(window.allProducts || [], query);
+        }
+
+        // ======== ДОБАВЛЕНИЕ ========
+        async function addProduct() {
+            const title = document.getElementById('productTitle').value.trim();
+            const price = document.getElementById('productPrice').value.trim();
+            const location = document.getElementById('productLocation').value.trim();
+            const hashtags = document.getElementById('productHashtags').value.trim();
+            const category = document.getElementById('productCategory').value;
+            const description = document.getElementById('productDescription').value.trim();
+            const fileInput = document.getElementById('productImage');
+            const file = fileInput.files[0];
+
+            if (!title || !price || !location || !hashtags) {
+                alert('ЗАПОЛНИ ВСЕ ПОЛЯ');
+                return;
+            }
+
+            let imageBase64 = '';
+            if (file) {
+                const reader = new FileReader();
+                imageBase64 = await new Promise(resolve => {
+                    reader.onload = e => resolve(e.target.result);
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            const newProduct = {
+                title,
+                price,
+                location,
+                hashtags,
+                category,
+                description,
+                image: imageBase64,
+                created_at: new Date().toISOString()
+            };
+
+            const { error } = await supabase.from(TABLE_NAME).insert([newProduct]);
+
+            if (error) {
+                console.error('Ошибка добавления:', error);
+                alert('ОШИБКА ПРИ ДОБАВЛЕНИИ. ПОПРОБУЙ ЕЩЁ.');
+                return;
+            }
+
+            alert('ТОВАР ОПУБЛИКОВАН!');
+            clearForm();
+            window.allProducts = null;
+            loadProducts();
+            showPage('catalog');
+        }
+
+        function clearForm() {
+            document.getElementById('productTitle').value = '';
+            document.getElementById('productPrice').value = '';
+            document.getElementById('productLocation').value = '';
+            document.getElementById('productHashtags').value = '';
+            document.getElementById('productDescription').value = '';
+            document.getElementById('productImage').value = '';
+        }
+
+        // ======== ИНИЦИАЛИЗАЦИЯ ========
+        loadProducts();
+    </script>
+</body>
+</html>
