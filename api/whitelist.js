@@ -1,93 +1,131 @@
 // api/whitelist.js
-const fs = require('fs');
-const path = require('path');
-
-const DB_PATH = path.join(__dirname, '../data/licenses.json');
 const ADMIN_KEY = 'Admin_Secret_2024';
 
-function readDB() {
-    try {
-        if (fs.existsSync(DB_PATH)) {
-            return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
-        }
-    } catch (e) {}
-    return { licenses: [], logs: [], settings: { helloMessage: '👋 Добро пожаловать в AirbusA220KITTED!' } };
-}
-
-function writeDB(data) {
-    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
-}
+// Общее хранилище (синхронизация с check-license)
+const DB = {
+    licenses: [
+        { userId: '4383533422', username: 'Dana_mammv', status: 'active' },
+        { userId: '123456789', username: 'TestUser', status: 'active' }
+    ]
+};
 
 module.exports = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
     const { action, adminKey, userId, username, status } = req.body;
 
-    // Проверка админ-ключа
     if (adminKey !== ADMIN_KEY) {
         return res.status(401).json({ error: 'Invalid admin key' });
     }
 
-    const db = readDB();
+    try {
+        switch (action) {
+            case 'list':
+                return res.json({ licenses: DB.licenses });
 
-    switch (action) {
-        case 'add':
-            if (!userId || !username) {
-                return res.status(400).json({ error: 'userId and username required' });
-            }
-            
-            // Проверяем, нет ли уже
-            const existing = db.licenses.find(l => l.userId === userId);
-            if (existing) {
-                return res.status(400).json({ error: 'License already exists', license: existing });
-            }
+            case 'add':
+                if (!userId || !username) {
+                    return res.status(400).json({ error: 'userId and username required' });
+                }
+                if (DB.licenses.find(l => l.userId === userId)) {
+                    return res.status(400).json({ error: 'License already exists' });
+                }
+                DB.licenses.push({ userId, username, status: 'active' });
+                return res.json({ success: true, license: { userId, username, status: 'active' } });
 
-            const newLicense = {
-                userId: userId,
-                username: username,
-                status: 'active',
-                licenseKey: generateLicenseKey(),
-                createdAt: Date.now()
-            };
-            db.licenses.push(newLicense);
-            writeDB(db);
-            return res.json({ success: true, license: newLicense });
+            case 'remove':
+                if (!userId) {
+                    return res.status(400).json({ error: 'userId required' });
+                }
+                DB.licenses = DB.licenses.filter(l => l.userId !== userId);
+                return res.json({ success: true });
 
-        case 'remove':
-            if (!userId) {
-                return res.status(400).json({ error: 'userId required' });
-            }
-            db.licenses = db.licenses.filter(l => l.userId !== userId);
-            writeDB(db);
-            return res.json({ success: true });
+            case 'update':
+                if (!userId || !status) {
+                    return res.status(400).json({ error: 'userId and status required' });
+                }
+                const license = DB.licenses.find(l => l.userId === userId);
+                if (!license) {
+                    return res.status(404).json({ error: 'License not found' });
+                }
+                license.status = status;
+                return res.json({ success: true, license });
 
-        case 'update':
-            if (!userId || !status) {
-                return res.status(400).json({ error: 'userId and status required' });
-            }
-            const license = db.licenses.find(l => l.userId === userId);
-            if (!license) {
-                return res.status(404).json({ error: 'License not found' });
-            }
-            license.status = status;
-            writeDB(db);
-            return res.json({ success: true, license });
-
-        case 'list':
-            return res.json({ licenses: db.licenses });
-
-        default:
-            return res.status(400).json({ error: 'Invalid action' });
+            default:
+                return res.status(400).json({ error: 'Invalid action' });
+        }
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
     }
+};// api/whitelist.js
+const ADMIN_KEY = 'Admin_Secret_2024';
+
+// Общее хранилище (синхронизация с check-license)
+const DB = {
+    licenses: [
+        { userId: '4383533422', username: 'Dana_mammv', status: 'active' },
+        { userId: '123456789', username: 'TestUser', status: 'active' }
+    ]
 };
 
-// Генерация лицензионного ключа
-function generateLicenseKey() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let key = '';
-    for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < 4; j++) {
-            key += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        if (i < 3) key += '-';
+module.exports = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
     }
-    return key;
-}
+
+    const { action, adminKey, userId, username, status } = req.body;
+
+    if (adminKey !== ADMIN_KEY) {
+        return res.status(401).json({ error: 'Invalid admin key' });
+    }
+
+    try {
+        switch (action) {
+            case 'list':
+                return res.json({ licenses: DB.licenses });
+
+            case 'add':
+                if (!userId || !username) {
+                    return res.status(400).json({ error: 'userId and username required' });
+                }
+                if (DB.licenses.find(l => l.userId === userId)) {
+                    return res.status(400).json({ error: 'License already exists' });
+                }
+                DB.licenses.push({ userId, username, status: 'active' });
+                return res.json({ success: true, license: { userId, username, status: 'active' } });
+
+            case 'remove':
+                if (!userId) {
+                    return res.status(400).json({ error: 'userId required' });
+                }
+                DB.licenses = DB.licenses.filter(l => l.userId !== userId);
+                return res.json({ success: true });
+
+            case 'update':
+                if (!userId || !status) {
+                    return res.status(400).json({ error: 'userId and status required' });
+                }
+                const license = DB.licenses.find(l => l.userId === userId);
+                if (!license) {
+                    return res.status(404).json({ error: 'License not found' });
+                }
+                license.status = status;
+                return res.json({ success: true, license });
+
+            default:
+                return res.status(400).json({ error: 'Invalid action' });
+        }
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
