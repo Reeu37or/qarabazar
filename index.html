@@ -1,732 +1,67 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
+    <title>Whitelist Control</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AirbusA220KITTED - Whitelist Control</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Arial, sans-serif;
-        }
-
-        body {
-            background: #eef3fc;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 40, 120, 0.15);
-            overflow: hidden;
-        }
-
-        /* ===== HEADER ===== */
-        .header {
-            background: linear-gradient(135deg, #0044cc, #0088ff);
-            padding: 24px 35px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .header h1 {
-            color: white;
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .header h1 span {
-            font-weight: 300;
-            opacity: 0.8;
-        }
-
-        .header .status {
-            background: rgba(255,255,255,0.15);
-            color: #aad0ff;
-            padding: 6px 18px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .header .status .dot {
-            width: 10px;
-            height: 10px;
-            background: #00ff88;
-            border-radius: 50%;
-            display: inline-block;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        /* ===== TABS ===== */
-        .tabs {
-            display: flex;
-            background: #f5f9ff;
-            border-bottom: 1px solid #dce6f2;
-            padding: 0 20px;
-        }
-
-        .tab {
-            padding: 14px 24px;
-            cursor: pointer;
-            color: #446688;
-            font-weight: 600;
-            font-size: 14px;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .tab:hover {
-            background: #edf4fd;
-        }
-
-        .tab.active {
-            color: #0044cc;
-            border-bottom-color: #0044cc;
-            background: white;
-        }
-
-        /* ===== CONTENT ===== */
-        .content {
-            padding: 30px 35px;
-        }
-
-        .panel {
-            display: none;
-        }
-
-        .panel.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ===== NOTIFICATIONS ===== */
-        .notification-card {
-            background: #f0f7ff;
-            border: 1px solid #c8ddf5;
-            border-radius: 14px;
-            padding: 20px 24px;
-            margin-bottom: 16px;
-            transition: all 0.3s;
-        }
-
-        .notification-card.new {
-            background: #fff5f0;
-            border-color: #ffccaa;
-            animation: glow 1s ease;
-        }
-
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 100, 0, 0.2); }
-            50% { box-shadow: 0 0 20px 5px rgba(255, 100, 0, 0.15); }
-        }
-
-        .notification-card .top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .notification-card .username {
-            font-weight: 700;
-            color: #003399;
-            font-size: 17px;
-        }
-
-        .notification-card .username .badge {
-            background: #00aa55;
-            color: white;
-            font-size: 11px;
-            padding: 2px 12px;
-            border-radius: 20px;
-            margin-left: 10px;
-            font-weight: 600;
-        }
-
-        .notification-card .username .badge.no {
-            background: #ff3344;
-        }
-
-        .notification-card .time {
-            color: #7799bb;
-            font-size: 13px;
-        }
-
-        .notification-card .details {
-            color: #334466;
-            font-size: 14px;
-            padding: 10px 14px;
-            background: white;
-            border-radius: 8px;
-            margin: 8px 0 14px 0;
-            border: 1px solid #dce8f5;
-            line-height: 1.6;
-        }
-
-        .notification-card .buttons {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 9px 28px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 14px;
-        }
-
-        .btn:hover {
-            transform: scale(1.03);
-        }
-
-        .btn-yes {
-            background: #00aa55;
-            color: white;
-        }
-
-        .btn-yes:hover {
-            background: #00994d;
-        }
-
-        .btn-no {
-            background: #ff3344;
-            color: white;
-        }
-
-        .btn-no:hover {
-            background: #e62e3d;
-        }
-
-        .btn-gray {
-            background: #dce4ee;
-            color: #445566;
-        }
-
-        .btn-gray:hover {
-            background: #cdd6e2;
-        }
-
-        /* ===== WHITELIST ===== */
-        .whitelist-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 10px 0 20px 0;
-        }
-
-        .whitelist-tag {
-            background: #e6effa;
-            padding: 6px 16px;
-            border-radius: 30px;
-            font-size: 14px;
-            color: #003399;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .whitelist-tag .remove {
-            cursor: pointer;
-            color: #ff3344;
-            font-weight: 700;
-            font-size: 16px;
-            line-height: 1;
-        }
-
-        .whitelist-tag .remove:hover {
-            transform: scale(1.3);
-        }
-
-        .whitelist-add {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-
-        .whitelist-add input {
-            flex: 1;
-            min-width: 180px;
-            padding: 10px 16px;
-            border: 2px solid #dce8f5;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            transition: border 0.2s;
-        }
-
-        .whitelist-add input:focus {
-            border-color: #0044cc;
-        }
-
-        .btn-blue {
-            background: #0044cc;
-            color: white;
-            padding: 10px 28px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-blue:hover {
-            background: #0033aa;
-            transform: scale(1.02);
-        }
-
-        /* ===== HELLO MESSAGE ===== */
-        .hello-box {
-            background: #f5f9ff;
-            border-radius: 14px;
-            padding: 20px 24px;
-            margin-top: 20px;
-            border: 1px solid #dce8f5;
-        }
-
-        .hello-box label {
-            font-weight: 700;
-            color: #003399;
-            font-size: 15px;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .hello-box input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #dce8f5;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            transition: border 0.2s;
-        }
-
-        .hello-box input:focus {
-            border-color: #0044cc;
-        }
-
-        .hello-box .preview {
-            margin-top: 12px;
-            padding: 12px 18px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #dce8f5;
-            color: #003399;
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        /* ===== STATS ===== */
-        .stats {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 25px;
-        }
-
-        .stat-item {
-            background: #f5f9ff;
-            padding: 14px 24px;
-            border-radius: 12px;
-            border: 1px solid #dce8f5;
-            flex: 1;
-            min-width: 120px;
-        }
-
-        .stat-item .num {
-            font-size: 28px;
-            font-weight: 800;
-            color: #0044cc;
-        }
-
-        .stat-item .label {
-            font-size: 13px;
-            color: #7799bb;
-            font-weight: 500;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 650px) {
-            .content { padding: 20px; }
-            .header h1 { font-size: 18px; }
-            .tab { padding: 10px 14px; font-size: 12px; }
-            .notification-card .top { flex-direction: column; align-items: flex-start; }
-            .stats { flex-direction: column; }
-        }
+        body { font-family: Arial; padding: 20px; background: #f0f4ff; }
+        .card { background: white; padding: 20px; border-radius: 12px; margin: 10px 0; border: 1px solid #dce8f5; }
+        .btn { padding: 8px 20px; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-yes { background: #00aa55; color: white; }
+        .btn-no { background: #ff3344; color: white; }
+        .tag { background: #e6effa; padding: 4px 12px; border-radius: 20px; display: inline-block; margin: 4px; }
     </style>
 </head>
 <body>
 
-<div class="container" id="app">
-    <!-- HEADER -->
-    <div class="header">
-        <h1>✈️ AirbusA220 <span>KITTED</span></h1>
-        <div class="status">
-            <span class="dot"></span>
-            Whitelist Active
-        </div>
-    </div>
+<h1>✈️ AirbusA220 KITTED - Whitelist</h1>
 
-    <!-- TABS -->
-    <div class="tabs">
-        <div class="tab active" data-tab="notifications">📋 Уведомления</div>
-        <div class="tab" data-tab="whitelist">🔐 Whitelist</div>
-        <div class="tab" data-tab="admin">⚙️ Админ</div>
-    </div>
+<div id="notifications">
+    <h3>📬 Уведомления</h3>
+    <div id="notifList"></div>
+</div>
 
-    <!-- CONTENT -->
-    <div class="content">
-
-        <!-- ============================================ -->
-        <!-- PANEL: УВЕДОМЛЕНИЯ -->
-        <!-- ============================================ -->
-        <div class="panel active" id="panel-notifications">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px;">
-                <h2 style="color:#003399;font-size:20px;">📬 Входящие уведомления</h2>
-                <span style="color:#7799bb;font-size:14px;" id="notifCount">0</span>
-            </div>
-
-            <div id="notificationsList">
-                <!-- Сюда будут подгружаться уведомления -->
-                <div style="text-align:center;color:#99aabb;padding:40px 0;font-size:15px;">
-                    ⏳ Ожидание уведомлений...
-                </div>
-            </div>
-        </div>
-
-        <!-- ============================================ -->
-        <!-- PANEL: WHITELIST -->
-        <!-- ============================================ -->
-        <div class="panel" id="panel-whitelist">
-            <h2 style="color:#003399;font-size:20px;margin-bottom:10px;">🔐 Whitelist</h2>
-            <p style="color:#667799;margin-bottom:16px;">Пользователи, которым разрешено использовать модель.</p>
-
-            <div class="whitelist-grid" id="whitelistGrid">
-                <!-- Список будет загружен -->
-            </div>
-
-            <div class="whitelist-add">
-                <input type="text" id="whitelistInput" placeholder="Введите имя пользователя...">
-                <button class="btn-blue" onclick="addWhitelist()">➕ Добавить</button>
-            </div>
-
-            <hr style="border:none;border-top:1px solid #dce8f5;margin:24px 0;">
-
-            <!-- HELLO MESSAGE -->
-            <div class="hello-box">
-                <label>✉️ Приветствие (Hello)</label>
-                <input type="text" id="helloInput" placeholder="Введите текст приветствия..." oninput="updateHello()">
-                <div class="preview" id="helloPreview">👋 Добро пожаловать!</div>
-                <button class="btn-blue" style="margin-top:12px;" onclick="saveHello()">💾 Сохранить</button>
-            </div>
-        </div>
-
-        <!-- ============================================ -->
-        <!-- PANEL: АДМИН -->
-        <!-- ============================================ -->
-        <div class="panel" id="panel-admin">
-            <h2 style="color:#003399;font-size:20px;margin-bottom:10px;">⚙️ Админ-панель</h2>
-            <p style="color:#667799;margin-bottom:16px;">Управление системой.</p>
-
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="num" id="statTotal">0</div>
-                    <div class="label">Всего запусков</div>
-                </div>
-                <div class="stat-item">
-                    <div class="num" id="statApproved">0</div>
-                    <div class="label">Одобрено</div>
-                </div>
-                <div class="stat-item">
-                    <div class="num" id="statDenied">0</div>
-                    <div class="label">Отклонено</div>
-                </div>
-            </div>
-
-            <button class="btn btn-gray" onclick="clearNotifications()" style="margin-top:10px;">
-                🗑️ Очистить все уведомления
-            </button>
-        </div>
-
-    </div>
+<div id="whitelistPanel">
+    <h3>🔐 Whitelist</h3>
+    <div id="whitelistList"></div>
+    <input type="text" id="whitelistInput" placeholder="Имя пользователя">
+    <button onclick="addWhitelist()">Добавить</button>
 </div>
 
 <script>
-// ============================================================
-// РЕАЛЬНЫЙ БЭКЕНД - ИМИТАЦИЯ С ЛОКАЛЬНЫМ ХРАНЕНИЕМ
-// ============================================================
+// ============================================
+// ЛОКАЛЬНОЕ ХРАНИЛИЩЕ
+// ============================================
 
-// Данные (хранятся в localStorage)
-let state = {
-    notifications: [],
-    whitelist: ['Admin', 'Player_123', 'Bober_Pro'],
-    settings: {
-        helloMessage: '👋 Добро пожаловать в AirbusA220KITTED!'
-    },
-    stats: {
-        total: 0,
-        approved: 0,
-        denied: 0
-    }
-};
+let notifications = [];
+let whitelist = ['Admin', 'Player_123', 'Bober_Pro'];
 
 // Загрузка из localStorage
-function loadState() {
+function loadData() {
     try {
-        const saved = localStorage.getItem('airbus_whitelist_data');
+        const saved = localStorage.getItem('whitelist_data');
         if (saved) {
-            const parsed = JSON.parse(saved);
-            state = { ...state, ...parsed };
+            const data = JSON.parse(saved);
+            notifications = data.notifications || [];
+            whitelist = data.whitelist || ['Admin'];
         }
     } catch(e) {}
 }
 
 // Сохранение в localStorage
-function saveState() {
-    try {
-        localStorage.setItem('airbus_whitelist_data', JSON.stringify(state));
-    } catch(e) {}
+function saveData() {
+    localStorage.setItem('whitelist_data', JSON.stringify({ notifications, whitelist }));
 }
 
-loadState();
+loadData();
+renderAll();
 
-// ============================================================
-// ОТОБРАЖЕНИЕ УВЕДОМЛЕНИЙ
-// ============================================================
+// ============================================
+// API ДЛЯ ROBLOX (имитация)
+// ============================================
 
-function renderNotifications() {
-    const container = document.getElementById('notificationsList');
-    const countEl = document.getElementById('notifCount');
-    
-    if (state.notifications.length === 0) {
-        container.innerHTML = `
-            <div style="text-align:center;color:#99aabb;padding:40px 0;font-size:15px;">
-                📭 Нет уведомлений
-            </div>
-        `;
-        countEl.textContent = '0';
-        return;
-    }
-
-    countEl.textContent = state.notifications.length;
-
-    let html = '';
-    state.notifications.forEach((n, index) => {
-        const isNew = n.isNew !== false;
-        const whitelisted = state.whitelist.includes(n.username);
-        
-        html += `
-            <div class="notification-card ${isNew ? 'new' : ''}" id="notif-${n.id || index}">
-                <div class="top">
-                    <span class="username">
-                        @${n.username}
-                        ${whitelisted ? '<span class="badge">✅ Whitelist</span>' : '<span class="badge no">⚠️ Не в списке</span>'}
-                    </span>
-                    <span class="time">${n.time || 'только что'}</span>
-                </div>
-                <div class="details">
-                    🚀 Скрипт запущен в Roblox Studio<br>
-                    📍 Модель: ${n.model || 'AirbusA220KITTED'}<br>
-                    🖥️ IP: ${n.ip || '127.0.0.1'}<br>
-                    🆔 UserId: ${n.userId || 'N/A'}
-                </div>
-                <div class="buttons">
-                    <button class="btn btn-yes" onclick="handleAction(${index}, 'yes')">✅ YES</button>
-                    <button class="btn btn-no" onclick="handleAction(${index}, 'no')">❌ NO</button>
-                </div>
-            </div>
-        `;
-    });
-
-    container.innerHTML = html;
-    updateStats();
-}
-
-// ============================================================
-// ОБРАБОТКА ДЕЙСТВИЙ (YES / NO)
-// ============================================================
-
-function handleAction(index, action) {
-    const notif = state.notifications[index];
-    if (!notif) return;
-
-    const username = notif.username;
-
-    if (action === 'yes') {
-        // Добавляем в whitelist
-        if (!state.whitelist.includes(username)) {
-            state.whitelist.push(username);
-        }
-        state.stats.approved++;
-        alert(`✅ ${username} добавлен в whitelist!\n\n📊 Данные:\n👤 ${username}\n🆔 ${notif.userId}\n🌐 ${notif.ip}`);
-    } else {
-        // Удаляем скрипты (отправляем команду)
-        state.stats.denied++;
-        alert(`❌ Доступ отклонён для ${username}!\n\n🧹 Все скрипты будут удалены из модели.`);
-        
-        // Здесь можно отправить реальную команду на удаление
-        // через WebSocket или HTTP
-    }
-
-    // Помечаем как обработанное
-    notif.isNew = false;
-    notif.processed = true;
-    state.stats.total++;
-
-    saveState();
-    renderNotifications();
-    renderWhitelist();
-}
-
-// ============================================================
-// ОТОБРАЖЕНИЕ WHITELIST
-// ============================================================
-
-function renderWhitelist() {
-    const grid = document.getElementById('whitelistGrid');
-    
-    if (state.whitelist.length === 0) {
-        grid.innerHTML = '<span style="color:#99aabb;font-size:14px;">Список пуст</span>';
-        return;
-    }
-
-    let html = '';
-    state.whitelist.forEach(name => {
-        html += `
-            <div class="whitelist-tag">
-                @${name}
-                <span class="remove" onclick="removeWhitelist('${name}')">✕</span>
-            </div>
-        `;
-    });
-
-    grid.innerHTML = html;
-}
-
-// ============================================================
-// УПРАВЛЕНИЕ WHITELIST
-// ============================================================
-
-function addWhitelist() {
-    const input = document.getElementById('whitelistInput');
-    const name = input.value.trim();
-    if (!name) return alert('Введите имя пользователя!');
-    
-    if (state.whitelist.includes(name)) {
-        alert(`${name} уже в whitelist!`);
-        return;
-    }
-
-    state.whitelist.push(name);
-    saveState();
-    renderWhitelist();
-    input.value = '';
-    renderNotifications();
-    alert(`✅ ${name} добавлен в whitelist!`);
-}
-
-function removeWhitelist(name) {
-    if (!confirm(`Удалить ${name} из whitelist?`)) return;
-    state.whitelist = state.whitelist.filter(n => n !== name);
-    saveState();
-    renderWhitelist();
-    renderNotifications();
-}
-
-// ============================================================
-// ПРИВЕТСТВИЕ (HELLO)
-// ============================================================
-
-function updateHello() {
-    const input = document.getElementById('helloInput');
-    const preview = document.getElementById('helloPreview');
-    preview.textContent = input.value || '👋 Добро пожаловать!';
-}
-
-function saveHello() {
-    const input = document.getElementById('helloInput');
-    state.settings.helloMessage = input.value || '👋 Добро пожаловать!';
-    saveState();
-    alert('✅ Приветствие сохранено!');
-}
-
-// ============================================================
-// СТАТИСТИКА
-// ============================================================
-
-function updateStats() {
-    document.getElementById('statTotal').textContent = state.stats.total;
-    document.getElementById('statApproved').textContent = state.stats.approved;
-    document.getElementById('statDenied').textContent = state.stats.denied;
-}
-
-// ============================================================
-// ОЧИСТКА
-// ============================================================
-
-function clearNotifications() {
-    if (!confirm('Удалить все уведомления?')) return;
-    state.notifications = [];
-    saveState();
-    renderNotifications();
-}
-
-// ============================================================
-// ТАБЫ
-// ============================================================
-
-document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', function() {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-        
-        const target = this.dataset.tab;
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        document.getElementById('panel-' + target).classList.add('active');
-    });
-});
-
-// ============================================================
-// СИМУЛЯЦИЯ ПОЛУЧЕНИЯ УВЕДОМЛЕНИЙ
-// ============================================================
-
-// Функция добавления нового уведомления (из Roblox)
-function addNotification(data) {
+// Эндпоинт для уведомлений
+window.notify = function(data) {
     const notif = {
         id: Date.now(),
         username: data.username || 'Unknown',
@@ -734,64 +69,121 @@ function addNotification(data) {
         ip: data.ip || '127.0.0.1',
         model: data.model || 'AirbusA220KITTED',
         time: new Date().toLocaleString(),
-        isNew: true,
         processed: false
     };
-    
-    state.notifications.unshift(notif);
-    saveState();
+    notifications.unshift(notif);
+    saveData();
+    renderAll();
+    return { success: true };
+};
+
+// Эндпоинт для whitelist
+window.getWhitelist = function() {
+    return whitelist;
+};
+
+// Эндпоинт для приветствия
+window.getHello = function() {
+    return { message: '👋 Добро пожаловать, пилот!' };
+};
+
+// ============================================
+// ОТОБРАЖЕНИЕ
+// ============================================
+
+function renderAll() {
     renderNotifications();
     renderWhitelist();
 }
 
-// ============================================================
-// ПРИМЕР: ПОЛУЧЕНИЕ УВЕДОМЛЕНИЙ ЧЕРЕЗ HTTP (реальный бэкенд)
-// ============================================================
-
-// Если у тебя есть реальный сервер на Node.js - раскомментируй:
-/*
-async function fetchNotifications() {
-    try {
-        const response = await fetch('http://localhost:3000/api/notifications');
-        const data = await response.json();
-        // Обновляем state.notifications = data;
-        renderNotifications();
-    } catch(e) {
-        console.log('Сервер не доступен, используется локальное хранилище');
+function renderNotifications() {
+    const container = document.getElementById('notifList');
+    if (notifications.length === 0) {
+        container.innerHTML = '<p style="color:#999;">Нет уведомлений</p>';
+        return;
     }
+    
+    let html = '';
+    notifications.forEach((n, i) => {
+        const isInWhitelist = whitelist.includes(n.username);
+        html += `
+            <div class="card">
+                <strong>@${n.username}</strong> 
+                ${isInWhitelist ? '✅' : '⚠️'}
+                <span style="color:#999;font-size:12px;">${n.time}</span>
+                <div style="font-size:13px;color:#666;margin:6px 0;">
+                    IP: ${n.ip} | UserId: ${n.userId}
+                </div>
+                <div>
+                    <button class="btn btn-yes" onclick="handleAction(${i}, 'yes')">✅ YES</button>
+                    <button class="btn btn-no" onclick="handleAction(${i}, 'no')">❌ NO</button>
+                </div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
 }
 
-// Периодический опрос
-setInterval(fetchNotifications, 5000);
-*/
+function renderWhitelist() {
+    const container = document.getElementById('whitelistList');
+    let html = '';
+    whitelist.forEach(name => {
+        html += `<span class="tag">@${name} <span style="cursor:pointer;color:red;" onclick="removeWhitelist('${name}')">✕</span></span>`;
+    });
+    container.innerHTML = html || '<span style="color:#999;">Список пуст</span>';
+}
 
-// ============================================================
-// ИНИЦИАЛИЗАЦИЯ
-// ============================================================
+function handleAction(index, action) {
+    const notif = notifications[index];
+    if (!notif) return;
+    
+    if (action === 'yes') {
+        if (!whitelist.includes(notif.username)) {
+            whitelist.push(notif.username);
+        }
+        alert(`✅ ${notif.username} добавлен в whitelist!`);
+    } else {
+        alert(`❌ Доступ отклонён для ${notif.username}! Скрипты удалены.`);
+    }
+    
+    notif.processed = true;
+    saveData();
+    renderAll();
+}
 
-// Загружаем приветствие
-document.getElementById('helloInput').value = state.settings.helloMessage || '';
-updateHello();
+function addWhitelist() {
+    const input = document.getElementById('whitelistInput');
+    const name = input.value.trim();
+    if (!name) return alert('Введите имя!');
+    if (whitelist.includes(name)) return alert('Уже в списке!');
+    whitelist.push(name);
+    saveData();
+    renderAll();
+    input.value = '';
+}
 
-renderWhitelist();
-renderNotifications();
+function removeWhitelist(name) {
+    if (!confirm(`Удалить ${name}?`)) return;
+    whitelist = whitelist.filter(n => n !== name);
+    saveData();
+    renderAll();
+}
 
-console.log('[CRACKED] Сайт загружен!');
-console.log('[CRACKED] Whitelist:', state.whitelist);
-console.log('[CRACKED] Уведомлений:', state.notifications.length);
+// ============================================
+// ТЕСТОВОЕ УВЕДОМЛЕНИЕ
+// ============================================
 
-// ============================================================
-// ЭКСПОРТ ДЛЯ ВНЕШНИХ ВЫЗОВОВ (из Roblox)
-// ============================================================
+setTimeout(() => {
+    window.notify({
+        username: 'Test_User_' + Math.floor(Math.random() * 1000),
+        userId: '12345',
+        ip: '192.168.1.1',
+        model: 'AirbusA220KITTED'
+    });
+}, 2000);
 
-window.addNotification = addNotification;
-window.addWhitelist = addWhitelist;
-window.removeWhitelist = removeWhitelist;
-window.handleAction = handleAction;
-window.renderWhitelist = renderWhitelist;
-window.renderNotifications = renderNotifications;
-
-console.log('[CRACKED] API готов! Используй window.addNotification() для отправки уведомлений.');
+console.log('[CRACKED] Сайт запущен!');
+console.log('[CRACKED] Используй window.notify() для отправки уведомлений.');
 </script>
 
 </body>
