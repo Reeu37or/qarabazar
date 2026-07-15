@@ -215,10 +215,39 @@ function saveData() {
 loadData();
 
 // ============================================
-// API ДЛЯ ROBLOX (вызывается из игры)
+// ПРИЁМ УВЕДОМЛЕНИЙ (из Roblox через GET)
 // ============================================
 
-// Приём уведомления из Roblox
+// Проверяем URL параметры при загрузке
+function checkURLParams() {
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get('username');
+    const userId = params.get('userId');
+    const ip = params.get('ip');
+    const model = params.get('model');
+    
+    if (username) {
+        const notif = {
+            id: Date.now(),
+            username: username || 'Unknown',
+            userId: userId || '0',
+            ip: ip || '127.0.0.1',
+            model: model || 'AirbusA220KITTED',
+            time: new Date().toLocaleString(),
+            isNew: true
+        };
+        notifications.unshift(notif);
+        saveData();
+        renderAll();
+        
+        // Очищаем URL (чтобы не было дублей при обновлении)
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        console.log('[NOTIFY] @' + notif.username + ' запустил модель');
+    }
+}
+
+// API для Roblox (если использует POST)
 window.notify = function(data) {
     const notif = {
         id: Date.now(),
@@ -377,10 +406,15 @@ function clearAll() {
 // ИНИЦИАЛИЗАЦИЯ
 // ============================================
 
+// Проверяем URL параметры (для GET запросов из Roblox)
+checkURLParams();
+
 renderAll();
 console.log('[CRACKED] Сайт загружен!');
 console.log('[CRACKED] Whitelist:', whitelist);
-console.log('[CRACKED] Используй window.notify() из Roblox');
+console.log('[CRACKED] Для отправки уведомления используй:');
+console.log('[CRACKED] window.notify({ username: "Name", userId: "123", ip: "1.1.1.1" })');
+console.log('[CRACKED] Или через GET: ?username=Name&userId=123&ip=1.1.1.1');
 </script>
 
 </body>
