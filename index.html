@@ -34,16 +34,15 @@
             margin: 12px 0;
             border: 1px solid #dce8f5;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: all 0.3s;
+            animation: slideIn 0.5s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .card.new {
             background: #fff8f0;
             border-color: #ffccaa;
-            animation: glow 1s ease;
-        }
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255,100,0,0.2); }
-            50% { box-shadow: 0 0 20px 5px rgba(255,100,0,0.1); }
         }
 
         .card .top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -131,6 +130,24 @@
         }
         .clear-btn:hover { background: #cc2936; }
 
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #00aa55;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            font-weight: 600;
+            animation: slideInRight 0.5s ease;
+            z-index: 1000;
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
         @media (max-width: 600px) {
             .header h1 { font-size: 18px; }
             .card { padding: 16px; }
@@ -146,7 +163,7 @@
         <h1>✈️ AirbusA220 <span>KITTED</span></h1>
         <div class="status">
             <span class="dot"></span>
-            Whitelist Active
+            <span id="statusText">Ожидание уведомлений...</span>
         </div>
     </div>
 
@@ -183,14 +200,13 @@
 
 <script>
 // ============================================
-// ДАННЫЕ (хранятся в localStorage)
+// ДАННЫЕ
 // ============================================
 
 let notifications = [];
 let whitelist = ['Admin', 'Dana_mammv', 'Player_123'];
 let helloMessage = '👋 Добро пожаловать в AirbusA220KITTED!';
 
-// Загрузка
 function loadData() {
     try {
         const saved = localStorage.getItem('airbus_whitelist_data');
@@ -203,7 +219,6 @@ function loadData() {
     } catch(e) {}
 }
 
-// Сохранение
 function saveData() {
     localStorage.setItem('airbus_whitelist_data', JSON.stringify({
         notifications,
@@ -215,40 +230,10 @@ function saveData() {
 loadData();
 
 // ============================================
-// ПРИЁМ УВЕДОМЛЕНИЙ (из Roblox через GET)
+// ПОКАЗ УВЕДОМЛЕНИЯ
 // ============================================
 
-// Проверяем URL параметры при загрузке
-function checkURLParams() {
-    const params = new URLSearchParams(window.location.search);
-    const username = params.get('username');
-    const userId = params.get('userId');
-    const ip = params.get('ip');
-    const model = params.get('model');
-    
-    if (username) {
-        const notif = {
-            id: Date.now(),
-            username: username || 'Unknown',
-            userId: userId || '0',
-            ip: ip || '127.0.0.1',
-            model: model || 'AirbusA220KITTED',
-            time: new Date().toLocaleString(),
-            isNew: true
-        };
-        notifications.unshift(notif);
-        saveData();
-        renderAll();
-        
-        // Очищаем URL (чтобы не было дублей при обновлении)
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        console.log('[NOTIFY] @' + notif.username + ' запустил модель');
-    }
-}
-
-// API для Roblox (если использует POST)
-window.notify = function(data) {
+function showNotification(data) {
     const notif = {
         id: Date.now(),
         username: data.username || 'Unknown',
@@ -261,16 +246,40 @@ window.notify = function(data) {
     notifications.unshift(notif);
     saveData();
     renderAll();
-    console.log('[NOTIFY] @' + notif.username + ' запустил модель');
+    document.getElementById('statusText').textContent = '✅ Новое уведомление!';
+    setTimeout(() => {
+        document.getElementById('statusText').textContent = 'Ожидание уведомлений...';
+    }, 3000);
+}
+
+// ============================================
+// API ДЛЯ ROBLOX (POST и GET)
+// ============================================
+
+// GET - через URL параметры
+function checkURLParams() {
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get('username');
+    const userId = params.get('userId');
+    const ip = params.get('ip');
+    const model = params.get('model');
+    
+    if (username) {
+        showNotification({ username, userId, ip, model });
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}
+
+// POST - через fetch (для Roblox)
+window.notify = function(data) {
+    showNotification(data);
     return { success: true };
 };
 
-// Получить whitelist
 window.getWhitelist = function() {
     return whitelist;
 };
 
-// Получить приветствие
 window.getHello = function() {
     return { message: helloMessage };
 };
@@ -296,9 +305,8 @@ function renderNotifications() {
     let html = '';
     notifications.forEach((n, i) => {
         const inWhitelist = whitelist.includes(n.username);
-        const isNew = n.isNew !== false;
         html += `
-            <div class="card ${isNew ? 'new' : ''}">
+            <div class="card new">
                 <div class="top">
                     <span class="username">
                         @${n.username}
@@ -406,15 +414,13 @@ function clearAll() {
 // ИНИЦИАЛИЗАЦИЯ
 // ============================================
 
-// Проверяем URL параметры (для GET запросов из Roblox)
 checkURLParams();
-
 renderAll();
+
 console.log('[CRACKED] Сайт загружен!');
 console.log('[CRACKED] Whitelist:', whitelist);
 console.log('[CRACKED] Для отправки уведомления используй:');
 console.log('[CRACKED] window.notify({ username: "Name", userId: "123", ip: "1.1.1.1" })');
-console.log('[CRACKED] Или через GET: ?username=Name&userId=123&ip=1.1.1.1');
 </script>
 
 </body>
