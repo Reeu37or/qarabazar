@@ -7,17 +7,17 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background: #f0f4ff; padding: 20px; }
         .container { max-width: 900px; margin: 0 auto; }
-        .header { background: linear-gradient(135deg, #0044cc, #0088ff); padding: 20px 30px; border-radius: 16px; color: white; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .card { background: white; padding: 20px; border-radius: 12px; margin: 12px 0; border: 1px solid #dce8f5; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .header { background: linear-gradient(135deg, #0044cc, #0088ff); padding: 20px 30px; border-radius: 16px; color: white; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .card { background: white; padding: 20px; border-radius: 12px; margin: 12px 0; border: 1px solid #dce8f5; }
         .card .top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .card .username { font-weight: 700; color: #003399; font-size: 17px; }
         .card .time { color: #7799bb; font-size: 13px; }
         .card .details { margin: 8px 0 12px 0; padding: 10px; background: #f5f9ff; border-radius: 8px; font-size: 14px; color: #445566; }
         .btn { padding: 8px 24px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 14px; }
         .btn-yes { background: #00aa55; color: white; }
-        .btn-yes:hover { background: #00994d; transform: scale(1.02); }
+        .btn-yes:hover { background: #00994d; }
         .btn-no { background: #ff3344; color: white; }
-        .btn-no:hover { background: #e62e3d; transform: scale(1.02); }
+        .btn-no:hover { background: #e62e3d; }
         .tag { background: #e6effa; padding: 6px 16px; border-radius: 30px; display: inline-block; margin: 4px; font-size: 14px; color: #003399; }
         .tag .remove { cursor: pointer; color: #ff3344; font-weight: 700; margin-left: 10px; }
         .whitelist-add { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
@@ -30,12 +30,12 @@
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .badge { background: #00aa55; color: white; font-size: 11px; padding: 2px 12px; border-radius: 20px; margin-left: 10px; font-weight: 600; }
         .badge.no { background: #ff3344; }
+        .notification-sound { background: #fff5f0; border-color: #ffccaa; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- HEADER -->
     <div class="header">
         <h1>✈️ AirbusA220 <span style="font-weight:300;opacity:0.8;">KITTED</span></h1>
         <div>
@@ -44,14 +44,12 @@
         </div>
     </div>
 
-    <!-- УВЕДОМЛЕНИЯ -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <h2 style="color:#003399;">📬 Уведомления</h2>
         <span style="color:#7799bb;font-size:14px;" id="notifCount">0</span>
     </div>
     <div id="notifList"></div>
 
-    <!-- WHITELIST -->
     <div style="margin-top:30px;background:white;padding:20px;border-radius:12px;border:1px solid #dce8f5;">
         <h3 style="color:#003399;">🔐 Whitelist</h3>
         <div id="whitelistList" style="margin:10px 0;"></div>
@@ -61,7 +59,6 @@
         </div>
     </div>
 
-    <!-- ПРИВЕТСТВИЕ -->
     <div style="margin-top:20px;background:white;padding:20px;border-radius:12px;border:1px solid #dce8f5;">
         <h3 style="color:#003399;">✉️ Приветствие (Hello)</h3>
         <input type="text" id="helloInput" placeholder="Введите текст приветствия..." style="width:100%;padding:12px;border:2px solid #dce8f5;border-radius:8px;font-size:14px;margin:10px 0;outline:none;">
@@ -76,10 +73,9 @@
 // ============================================
 
 let notifications = [];
-let whitelist = ['Admin'];
+let whitelist = ['Admin', 'Player_123'];
 let helloMessage = '👋 Добро пожаловать в AirbusA220KITTED!';
 
-// Загрузка из localStorage
 function loadData() {
     try {
         const saved = localStorage.getItem('whitelist_data');
@@ -92,7 +88,6 @@ function loadData() {
     } catch(e) {}
 }
 
-// Сохранение в localStorage
 function saveData() {
     localStorage.setItem('whitelist_data', JSON.stringify({ notifications, whitelist, helloMessage }));
 }
@@ -100,10 +95,9 @@ function saveData() {
 loadData();
 
 // ============================================
-// API ДЛЯ ROBLOX (реальные уведомления)
+// API
 // ============================================
 
-// ЭТОТ ФУНКЦИЮ ВЫЗЫВАЕТ ROBLOX СКРИПТ
 window.notify = function(data) {
     const notif = {
         id: Date.now(),
@@ -121,12 +115,10 @@ window.notify = function(data) {
     return { success: true };
 };
 
-// Получение whitelist
 window.getWhitelist = function() {
     return whitelist;
 };
 
-// Получение приветствия
 window.getHello = function() {
     return { message: helloMessage };
 };
@@ -153,7 +145,7 @@ function renderNotifications() {
     notifications.forEach((n, i) => {
         const isInWhitelist = whitelist.includes(n.username);
         html += `
-            <div class="card">
+            <div class="card ${!isInWhitelist ? 'notification-sound' : ''}">
                 <div class="top">
                     <span class="username">
                         @${n.username}
@@ -163,7 +155,7 @@ function renderNotifications() {
                 </div>
                 <div class="details">
                     🚀 Скрипт запущен в Roblox Studio<br>
-                    📍 Модель: ${n.model || 'AirbusA220KITTED'}<br>
+                    📍 Модель: ${n.model}<br>
                     🖥️ IP: ${n.ip}<br>
                     🆔 UserId: ${n.userId}
                 </div>
@@ -251,7 +243,6 @@ function saveHello() {
 renderAll();
 console.log('[CRACKED] Сайт запущен!');
 console.log('[CRACKED] Whitelist:', whitelist);
-console.log('[CRACKED] Используй window.notify() для отправки уведомлений из Roblox.');
 </script>
 
 </body>
