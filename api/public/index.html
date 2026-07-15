@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirbusA220 - Whitelist Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: #f0f4ff; padding: 20px; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        .header {
+            background: linear-gradient(135deg, #0044cc, #0088ff);
+            padding: 20px 30px;
+            border-radius: 16px;
+            color: white;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .header h1 { font-size: 24px; }
+        .header h1 span { font-weight: 300; opacity: 0.8; }
+        .header .status { font-size: 14px; opacity: 0.9; }
+        .dot { width: 10px; height: 10px; background: #00ff88; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: white;
+            border-radius: 12px 12px 0 0;
+            overflow: hidden;
+            border: 1px solid #dce8f5;
+            border-bottom: none;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 14px 28px;
+            cursor: pointer;
+            background: #f5f9ff;
+            border: none;
+            font-weight: 600;
+            color: #667799;
+            transition: all 0.2s;
+            font-size: 14px;
+            border-bottom: 3px solid transparent;
+        }
+        .tab:hover { background: #edf4fd; }
+        .tab.active {
+            background: white;
+            color: #0044cc;
+            border-bottom-color: #0044cc;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 0 0 12px 12px;
+            border: 1px solid #dce8f5;
+            border-top: none;
+            display: none;
+            min-height: 400px;
+        }
+        .panel.active { display: block; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #f5f9ff;
+            padding: 18px 20px;
+            border-radius: 12px;
+            border: 1px solid #dce8f5;
+            text-align: center;
+        }
+        .stat-card .num { font-size: 28px; font-weight: 800; color: #0044cc; }
+        .stat-card .label { font-size: 13px; color: #7799bb; margin-top: 4px; }
+
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { background: #f5f9ff; text-align: left; padding: 12px 15px; border-bottom: 2px solid #dce8f5; }
+        td { padding: 10px 15px; border-bottom: 1px solid #eef3fc; }
+        tr:hover { background: #f8faff; }
+
+        .badge {
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge.active { background: #d4edda; color: #155724; }
+        .badge.suspended { background: #fff3cd; color: #856404; }
+        .badge.revoked { background: #f8d7da; color: #721c24; }
+        .badge.allowed { background: #d4edda; color: #155724; }
+        .badge.denied { background: #f8d7da; color: #721c24; }
+
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        .btn:hover { transform: scale(1.02); }
+        .btn-primary { background: #0044cc; color: white; }
+        .btn-primary:hover { background: #0033aa; }
+        .btn-danger { background: #ff3344; color: white; }
+        .btn-danger:hover { background: #cc2936; }
+        .btn-success { background: #00aa55; color: white; }
+        .btn-success:hover { background: #008844; }
+        .btn-warning { background: #ffc107; color: #333; }
+        .btn-warning:hover { background: #e0a800; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; color: #334466; margin-bottom: 5px; font-size: 14px; }
+        .form-group input, .form-group select {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px 14px;
+            border: 2px solid #dce8f5;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: #0044cc; }
+
+        .flex { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+        .log-filter { margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .log-filter input, .log-filter select { padding: 8px 14px; border: 2px solid #dce8f5; border-radius: 8px; font-size: 13px; outline: none; }
+
+        .empty { text-align: center; color: #99aabb; padding: 40px 0; }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideIn 0.4s ease;
+            z-index: 1000;
+        }
+        .toast.success { background: #00aa55; }
+        .toast.error { background: #ff3344; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @media (max-width: 700px) {
+            .header h1 { font-size: 18px; }
+            .tab { padding: 10px 16px; font-size: 12px; }
+            .panel { padding: 15px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .form-group input { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <h1>✈️ AirbusA220 <span>KITTED</span></h1>
+        <div class="status"><span class="dot"></span> Whitelist Admin Panel</div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab active" data-tab="dashboard">📊 Dashboard</button>
+        <button class="tab" data-tab="whitelist">🔐 Whitelist</button>
+        <button class="tab" data-tab="logs">📋 Logs</button>
+        <button class="tab" data-tab="settings">⚙️ Settings</button>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- DASHBOARD -->
+    <!-- ============================================ -->
+    <div class="panel active" id="panel-dashboard">
+        <h2 style="color:#003399;margin-bottom:15px;">📊 Статистика</h2>
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><div class="num" id="statTotal">0</div><div class="label">Всего лицензий</div></div>
+            <div class="stat-card"><div class="num" id="statActive">0</div><div class="label">Активных</div></div>
+            <div class="stat-card"><div class="num" id="statSuspended">0</div><div class="label">Приостановлено</div></div>
+            <div class="stat-card"><div class="num" id="statRevoked">0</div><div class="label">Отозвано</div></div>
+            <div class="stat-card"><div class="num" id="statChecks">0</div><div class="label">Всего проверок</div></div>
+            <div class="stat-card"><div class="num" id="statAllowed">0</div><div class="label">Разрешено</div></div>
+            <div class="stat-card"><div class="num" id="statDenied">0</div><div class="label">Запрещено</div></div>
+        </div>
+        <div style="background:#f5f9ff;padding:15px;border-radius:12px;border:1px solid #dce8f5;">
+            <strong style="color:#003399;">📌 Последняя проверка:</strong>
+            <span id="lastCheck" style="color:#667799;">Нет данных</span>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- WHITELIST -->
+    <!-- ============================================ -->
+    <div class="panel" id="panel-whitelist">
+        <h2 style="color:#003399;margin-bottom:15px;">🔐 Управление лицензиями</h2>
+        
+        <div style="background:#f5f9ff;padding:20px;border-radius:12px;margin-bottom:20px;border:1px solid #dce8f5;">
+            <h3 style="color:#003399;font-size:16px;margin-bottom:10px;">➕ Добавить лицензию</h3>
+            <div class="flex">
+                <div class="form-group" style="margin:0;flex:1;">
+                    <input type="text" id="addUserId" placeholder="UserId (например: 4383533422)">
+                </div>
+                <div class="form-group" style="margin:0;flex:1;">
+                    <input type="text" id="addUsername" placeholder="Username (например: Dana_mammv)">
+                </div>
+                <button class="btn btn-success" onclick="addLicense()">➕ Добавить</button>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>UserId</th>
+                        <th>Username</th>
+                        <th>Лицензионный ключ</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="whitelistTable">
+                    <tr><td colspan="5" class="empty">Загрузка...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- LOGS -->
+    <!-- ============================================ -->
+    <div class="panel" id="panel-logs">
+        <h2 style="color:#003399;margin-bottom:15px;">📋 Журнал проверок</h2>
+        
+        <div class="log-filter">
+            <input type="text" id="logFilter" placeholder="Поиск по юзернейму или UserId..." oninput="filterLogs()">
+            <select id="logResultFilter" onchange="filterLogs()">
+                <option value="">Все результаты</option>
+                <option value="allowed">Разрешено</option>
+                <option value="denied">Запрещено</option>
+            </select>
+            <button class="btn btn-primary" onclick="loadLogs()">🔄 Обновить</button>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>UserId</th>
+                        <th>Username</th>
+                        <th>PlaceId</th>
+                        <th>Дата</th>
+                        <th>Результат</th>
+                        <th>Статус лицензии</th>
+                    </tr>
+                </thead>
+                <tbody id="logsTable">
+                    <tr><td colspan="6" class="empty">Загрузка...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SETTINGS -->
+    <!-- ============================================ -->
+    <div class="panel" id="panel-settings">
+        <h2 style="color:#003399;margin-bottom:15px;">⚙️ Настройки</h2>
+        
+        <div style="max-width:600px;">
+            <div class="form-group">
+                <label>✉️ Приветственное сообщение (Hello)</label>
+                <input type="text" id="helloInput" placeholder="Введите текст приветствия...">
+            </div>
+            <button class="btn btn-primary" onclick="saveHello()">💾 Сохранить</button>
+            
+            <hr style="border:none;border-top:2px solid #dce8f5;margin:25px 0;">
+            
+            <div style="background:#fff5f0;padding:20px;border-radius:12px;border:1px solid #ffccaa;">
+                <h3 style="color:#cc2936;">⚠️ Опасная зона</h3>
+                <p style="color:#667799;font-size:14px;margin:8px 0 15px 0;">Удалить ВСЕ лицензии и логи (необратимое действие).</p>
+                <button class="btn btn-danger" onclick="clearAllData()">🗑️ Очистить всё</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// КОНФИГУРАЦИЯ
+// ============================================================
+
+const ADMIN_KEY = 'Admin_Secret_2024'; // ДОЛЖЕН СОВПАДАТЬ С API
+const API_BASE = '/api';
+
+// ============================================================
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+// ============================================================
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+async function fetchAPI(endpoint, options = {}) {
+    try {
+        const response = await fetch(`${API_BASE}${endpoint}`, {
+            ...options,
+            headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
+        });
+        return await response.json();
+    } catch (e) {
+        showToast('Ошибка соединения с сервером', 'error');
+        return null;
+    }
+}
+
+// ============================================================
+// ЗАГРУЗКА ДАННЫХ
+// ============================================================
+
+async function loadStats() {
+    const data = await fetchAPI(`/stats?adminKey=${ADMIN_KEY}`);
+    if (data) {
+        document.getElementById('statTotal').textContent = data.totalLicenses || 0;
+        document.getElementById('statActive').textContent = data.activeLicenses || 0;
+        document.getElementById('statSuspended').textContent = data.suspendedLicenses || 0;
+        document.getElementById('statRevoked').textContent = data.revokedLicenses || 0;
+        document.getElementById('statChecks').textContent = data.totalChecks || 0;
+        document.getElementById('statAllowed').textContent = data.allowedChecks || 0;
+        document.getElementById('statDenied').textContent = data.deniedChecks || 0;
+        
+        if (data.lastCheck) {
+            const lc = data.lastCheck;
+            document.getElementById('lastCheck').textContent = 
+                `${lc.username} (${lc.userId}) — ${lc.result} — ${new Date(lc.timestamp).toLocaleString()}`;
+        }
+    }
+}
+
+async function loadWhitelist() {
+    const data = await fetchAPI(`/whitelist?adminKey=${ADMIN_KEY}&action=list`);
+    const tbody = document.getElementById('whitelistTable');
+    
+    if (data && data.licenses && data.licenses.length > 0) {
+        let html = '';
+        data.licenses.forEach(l => {
+            const statusClass = l.status === 'active' ? 'active' : l.status === 'suspended' ? 'suspended' : 'revoked';
+            html += `
+                <tr>
+                    <td><code>${l.userId}</code></td>
+                    <td><strong>${l.username}</strong></td>
+                    <td><code style="background:#f0f4ff;padding:2px 8px;border-radius:4px;">${l.licenseKey || 'N/A'}</code></td>
+                    <td><span class="badge ${statusClass}">${l.status}</span></td>
+                    <td>
+                        <select onchange="updateStatus(${l.userId}, this.value)" style="padding:4px 8px;border-radius:6px;border:1px solid #dce8f5;">
+                            <option value="active" ${l.status === 'active' ? 'selected' : ''}>✅ Active</option>
+                            <option value="suspended" ${l.status === 'suspended' ? 'selected' : ''}>⏸️ Suspended</option>
+                            <option value="revoked" ${l.status === 'revoked' ? 'selected' : ''}>❌ Revoked</option>
+                        </select>
+                        <button class="btn btn-danger" style="padding:4px 12px;font-size:12px;" onclick="removeLicense(${l.userId})">✕</button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    } else {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty">📭 Нет лицензий</td></tr>';
+    }
+}
+
+async function loadLogs() {
+    const data = await fetchAPI(`/logs?adminKey=${ADMIN_KEY}&limit=200`);
+    const tbody = document.getElementById('logsTable');
+    
+    if (data && data.logs && data.logs.length > 0) {
+        let html = '';
+        data.logs.slice(0, 100).forEach(l => {
+            const resultClass = l.result === 'allowed' ? 'allowed' : 'denied';
+            const statusClass = l.status === 'active' ? 'active' : l.status === 'suspended' ? 'suspended' : 'revoked';
+            html += `
+                <tr>
+                    <td><code>${l.userId}</code></td>
+                    <td>${l.username}</td>
+                    <td><code style="font-size:12px;">${l.placeId || 'N/A'}</code></td>
+                    <td>${new Date(l.timestamp).toLocaleString()}</td>
+                    <td><span class="badge ${resultClass}">${l.result}</span></td>
+                    <td><span class="badge ${statusClass}">${l.status || 'unknown'}</span></td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    } else {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">📭 Нет логов</td></tr>';
+    }
+}
+
+async function loadSettings() {
+    const data = await fetchAPI(`/settings?adminKey=${ADMIN_KEY}&action=get`);
+    if (data && data.settings) {
+        document.getElementById('helloInput').value = data.settings.helloMessage || '';
+    }
+}
+
+// ============================================================
+// ДЕЙСТВИЯ
+// ============================================================
+
+async function addLicense() {
+    const userId = document.getElementById('addUserId').value.trim();
+    const username = document.getElementById('addUsername').value.trim();
+    
+    if (!userId || !username) {
+        showToast('Заполните все поля!', 'error');
+        return;
+    }
+    
+    const data = await fetchAPI('/whitelist', {
+        method: 'POST',
+        body: JSON.stringify({
+            adminKey: ADMIN_KEY,
+            action: 'add',
+            userId: userId,
+            username: username
+        })
+    });
+    
+    if (data && data.success) {
+        showToast(`✅ ${username} добавлен в whitelist!`);
+        document.getElementById('addUserId').value = '';
+        document.getElementById('addUsername').value = '';
+        loadWhitelist();
+        loadStats();
+    } else {
+        showToast(data?.error || 'Ошибка добавления', 'error');
+    }
+}
+
+async function removeLicense(userId) {
+    if (!confirm(`Удалить лицензию для UserId ${userId}?`)) return;
+    
+    const data = await fetchAPI('/whitelist', {
+        method: 'POST',
+        body: JSON.stringify({
+            adminKey: ADMIN_KEY,
+            action: 'remove',
+            userId: userId
+        })
+    });
+    
+    if (data && data.success) {
+        showToast(`✅ Лицензия удалена`);
+        loadWhitelist();
+        loadStats();
+    } else {
+        showToast('Ошибка удаления', 'error');
+    }
+}
+
+async function updateStatus(userId, status) {
+    const data = await fetchAPI('/whitelist', {
+        method: 'POST',
+        body: JSON.stringify({
+            adminKey: ADMIN_KEY,
+            action: 'update',
+            userId: userId,
+            status: status
+        })
+    });
+    
+    if (data && data.success) {
+        showToast(`✅ Статус изменён на ${status}`);
+        loadWhitelist();
+        loadStats();
+    } else {
+        showToast('Ошибка обновления', 'error');
+    }
+}
+
+async function saveHello() {
+    const message = document.getElementById('helloInput').value.trim() || '👋 Добро пожаловать!';
+    
+    const data = await fetchAPI('/settings', {
+        method: 'POST',
+        body: JSON.stringify({
+            adminKey: ADMIN_KEY,
+            action: 'update',
+            helloMessage: message
+        })
+    });
+    
+    if (data && data.success) {
+        showToast('✅ Приветствие сохранено!');
+    } else {
+        showToast('Ошибка сохранения', 'error');
+    }
+}
+
+async function clearAllData() {
+    if (!confirm('⚠️ УДАЛИТЬ ВСЕ ДАННЫЕ? Это необратимо!')) return;
+    if (!confirm('Точно уверен? Все лицензии и логи будут удалены!')) return;
+    
+    // Очищаем через удаление всех лицензий
+    const list = await fetchAPI(`/whitelist?adminKey=${ADMIN_KEY}&action=list`);
+    if (list && list.licenses) {
+        for (const l of list.licenses) {
+            await fetchAPI('/whitelist', {
+                method: 'POST',
+                body: JSON.stringify({
+                    adminKey: ADMIN_KEY,
+                    action: 'remove',
+                    userId: l.userId
+                })
+            });
+        }
+    }
+    
+    showToast('✅ Все данные очищены!');
+    loadWhitelist();
+    loadStats();
+    loadLogs();
+}
+
+function filterLogs() {
+    const filter = document.getElementById('logFilter').value.toLowerCase();
+    const resultFilter = document.getElementById('logResultFilter').value;
+    const rows = document.querySelectorAll('#logsTable tr');
+    
+    rows.forEach(row => {
+        if (row.querySelector('td.empty')) return;
+        const text = row.textContent.toLowerCase();
+        const result = row.querySelector('.badge')?.textContent || '';
+        let show = true;
+        if (filter && !text.includes(filter)) show = false;
+        if (resultFilter && result !== resultFilter) show = false;
+        row.style.display = show ? '' : 'none';
+    });
+}
+
+// ============================================================
+// ТАБЫ
+// ============================================================
+
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('panel-' + this.dataset.tab).classList.add('active');
+        
+        // Загружаем данные при переключении
+        const tabName = this.dataset.tab;
+        if (tabName === 'dashboard') loadStats();
+        if (tabName === 'whitelist') loadWhitelist();
+        if (tabName === 'logs') loadLogs();
+        if (tabName === 'settings') loadSettings();
+    });
+});
+
+// ============================================================
+// ИНИЦИАЛИЗАЦИЯ
+// ============================================================
+
+loadStats();
+loadWhitelist();
+loadLogs();
+loadSettings();
+
+// Автообновление каждые 30 секунд
+setInterval(() => {
+    loadStats();
+}, 30000);
+
+console.log('[ADMIN] Панель загружена!');
+console.log('[ADMIN] ADMIN_KEY:', ADMIN_KEY);
+</script>
+
+</body>
+</html>
