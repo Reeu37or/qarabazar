@@ -3,425 +3,757 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AirbusA220 - Whitelist Control</title>
+    <title>✈️ SkyLife License Manager</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background: #f0f4ff; padding: 20px; min-height: 100vh; display: flex; justify-content: center; }
-        .container { max-width: 1000px; width: 100%; }
-        
+        /* ====== RESET ====== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* ====== HEADER ====== */
         .header {
-            background: linear-gradient(135deg, #0044cc, #0088ff);
-            padding: 20px 30px;
-            border-radius: 16px;
-            color: white;
-            margin-bottom: 20px;
+            background: linear-gradient(135deg, #0a0e27, #1a1f4e);
+            padding: 30px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
         }
-        .header h1 { font-size: 22px; }
-        .header h1 span { font-weight: 300; opacity: 0.8; }
-        .status { display: flex; align-items: center; gap: 10px; font-size: 14px; }
-        .dot { width: 10px; height: 10px; background: #00ff88; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-        .card {
-            background: white;
-            padding: 20px 24px;
-            border-radius: 12px;
-            margin: 12px 0;
-            border: 1px solid #dce8f5;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            animation: slideIn 0.5s ease;
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff, #7b2ffc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .card.new {
-            background: #fff8f0;
-            border-color: #ffccaa;
-        }
-
-        .card .top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .card .username { font-weight: 700; color: #003399; font-size: 17px; }
-        .card .time { color: #7799bb; font-size: 13px; }
-        .card .details { margin: 10px 0 14px 0; padding: 12px; background: #f5f9ff; border-radius: 8px; font-size: 14px; color: #445566; line-height: 1.6; }
-        
-        .btn { padding: 8px 24px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 14px; }
-        .btn-yes { background: #00aa55; color: white; }
-        .btn-yes:hover { background: #00994d; transform: scale(1.02); }
-        .btn-no { background: #ff3344; color: white; }
-        .btn-no:hover { background: #e62e3d; transform: scale(1.02); }
-
-        .tag {
-            background: #e6effa;
-            padding: 6px 16px;
-            border-radius: 30px;
-            display: inline-block;
-            margin: 4px;
+        .logo span { color: #fff; -webkit-text-fill-color: #fff; }
+        .header-stats {
+            display: flex;
+            gap: 30px;
             font-size: 14px;
-            color: #003399;
-            font-weight: 500;
         }
-        .tag .remove { cursor: pointer; color: #ff3344; font-weight: 700; margin-left: 10px; }
-        .tag .remove:hover { transform: scale(1.3); }
-
-        .whitelist-add { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-        .whitelist-add input { flex: 1; min-width: 180px; padding: 10px 16px; border: 2px solid #dce8f5; border-radius: 8px; font-size: 14px; outline: none; }
-        .whitelist-add input:focus { border-color: #0044cc; }
-
-        .btn-blue { background: #0044cc; color: white; padding: 10px 28px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-        .btn-blue:hover { background: #0033aa; transform: scale(1.02); }
-
-        .empty { text-align: center; color: #99aabb; padding: 40px 0; font-size: 15px; }
-        .badge { background: #00aa55; color: white; font-size: 11px; padding: 2px 12px; border-radius: 20px; margin-left: 10px; font-weight: 600; }
-        .badge.no { background: #ff3344; }
-
-        .section-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 20px 0 12px 0;
-            flex-wrap: wrap;
-            gap: 10px;
+        .header-stats .stat-item {
+            text-align: center;
         }
-        .section-title h2 { color: #003399; font-size: 20px; }
-        .section-title span { color: #7799bb; font-size: 14px; }
+        .header-stats .stat-item .num {
+            font-size: 22px;
+            font-weight: 700;
+            color: #00d4ff;
+            display: block;
+        }
+        .header-stats .stat-item .label {
+            color: #8892b0;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
+        /* ====== CONTAINER ====== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* ====== PANELS ====== */
         .panel {
-            background: white;
-            padding: 20px 24px;
-            border-radius: 12px;
-            border: 1px solid #dce8f5;
-            margin-top: 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-        .panel h3 { color: #003399; margin-bottom: 10px; }
-
-        .hello-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #dce8f5;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            margin: 10px 0;
-        }
-        .hello-input:focus { border-color: #0044cc; }
-        .hello-preview {
-            padding: 12px 18px;
-            background: #f5f9ff;
-            border-radius: 8px;
-            color: #003399;
+        .panel-title {
+            font-size: 18px;
             font-weight: 600;
-            font-size: 16px;
+            margin-bottom: 20px;
+            color: #00d4ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .clear-btn {
-            background: #ff3344;
-            color: white;
-            padding: 6px 16px;
+        /* ====== FORM ====== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .form-group label {
+            font-size: 12px;
+            color: #8892b0;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group input, .form-group select {
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 30px rgba(0,212,255,0.05);
+        }
+        .form-group input::placeholder {
+            color: #4a5070;
+        }
+
+        /* ====== BUTTONS ====== */
+        .btn {
+            padding: 12px 28px;
             border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #7b2ffc);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0,212,255,0.3);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #00ff87, #60efff);
+            color: #000;
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0,255,135,0.3);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff0040, #ff6b6b);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(255,0,64,0.3);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #8892b0;
+        }
+        .btn-outline:hover {
+            border-color: #00d4ff;
+            color: #fff;
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+
+        /* ====== TABLE ====== */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 14px 16px;
+            color: #8892b0;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(255,255,255,0.05);
+        }
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            font-size: 14px;
+            vertical-align: middle;
+        }
+        tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        /* ====== BADGES ====== */
+        .badge {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge-active {
+            background: rgba(0,255,135,0.15);
+            color: #00ff87;
+        }
+        .badge-inactive {
+            background: rgba(255,255,255,0.05);
+            color: #8892b0;
+        }
+        .badge-expired {
+            background: rgba(255,200,0,0.15);
+            color: #ffc800;
+        }
+        .badge-banned {
+            background: rgba(255,0,64,0.2);
+            color: #ff0040;
+        }
+
+        /* ====== SEARCH ====== */
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .search-bar input {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+        }
+        .search-bar input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+        .search-bar select {
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        .search-bar select:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        /* ====== KEY DISPLAY ====== */
+        .key-display {
+            margin-top: 15px;
+            padding: 16px 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            color: #00d4ff;
+            word-break: break-all;
+            border: 1px dashed rgba(0,212,255,0.2);
+            display: none;
+        }
+        .key-display .copy-btn {
+            float: right;
+            background: rgba(255,255,255,0.05);
+            border: none;
+            color: #8892b0;
+            padding: 4px 12px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 12px;
         }
-        .clear-btn:hover { background: #cc2936; }
+        .key-display .copy-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
 
-        .toast {
+        /* ====== TOAST ====== */
+        .toast-container {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #00aa55;
-            color: white;
-            padding: 15px 25px;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 14px 24px;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            color: #fff;
             font-weight: 600;
-            animation: slideInRight 0.5s ease;
-            z-index: 1000;
+            font-size: 14px;
+            animation: slideInRight 0.4s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            min-width: 250px;
+            backdrop-filter: blur(10px);
+        }
+        .toast-success {
+            background: rgba(0,255,135,0.9);
+            color: #000;
+        }
+        .toast-error {
+            background: rgba(255,0,64,0.9);
+        }
+        .toast-info {
+            background: rgba(0,212,255,0.9);
+            color: #000;
+        }
+        .toast-warning {
+            background: rgba(255,200,0,0.9);
+            color: #000;
         }
         @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(100px); }
-            to { opacity: 1; transform: translateX(0); }
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        @media (max-width: 600px) {
-            .header h1 { font-size: 18px; }
-            .card { padding: 16px; }
-            .container { padding: 0; }
+        /* ====== RESPONSIVE ====== */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .header-stats {
+                gap: 20px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .search-bar {
+                flex-direction: column;
+            }
+            .container {
+                padding: 15px;
+            }
+            .panel {
+                padding: 18px;
+            }
+            table {
+                font-size: 12px;
+            }
+            th, td {
+                padding: 10px 12px;
+            }
+        }
+        @media (max-width: 480px) {
+            .header-stats {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .header-stats .stat-item .num {
+                font-size: 18px;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- HEADER -->
-    <div class="header">
-        <h1>✈️ AirbusA220 <span>KITTED</span></h1>
-        <div class="status">
-            <span class="dot"></span>
-            <span id="statusText">Ожидание уведомлений...</span>
-        </div>
-    </div>
-
-    <!-- NOTIFICATIONS -->
-    <div class="section-title">
-        <h2>📬 Уведомления</h2>
-        <div>
-            <span id="notifCount" style="color:#7799bb;font-size:14px;margin-right:10px;">0</span>
-            <button class="clear-btn" onclick="clearAll()">🗑️ Очистить</button>
-        </div>
-    </div>
-    <div id="notifList">
-        <div class="empty">📭 Нет уведомлений</div>
-    </div>
-
-    <!-- WHITELIST -->
-    <div class="panel">
-        <h3>🔐 Whitelist</h3>
-        <div id="whitelistList" style="margin:10px 0;"></div>
-        <div class="whitelist-add">
-            <input type="text" id="whitelistInput" placeholder="Введите имя пользователя...">
-            <button class="btn-blue" onclick="addWhitelist()">➕ Добавить</button>
-        </div>
-    </div>
-
-    <!-- HELLO -->
-    <div class="panel">
-        <h3>✉️ Приветствие (Hello)</h3>
-        <input class="hello-input" id="helloInput" placeholder="Введите текст приветствия..." oninput="updateHello()">
-        <div class="hello-preview" id="helloPreview">👋 Добро пожаловать!</div>
-        <button class="btn-blue" style="margin-top:10px;" onclick="saveHello()">💾 Сохранить</button>
-    </div>
-</div>
-
-<script>
-// ============================================
-// ДАННЫЕ
-// ============================================
-
-let notifications = [];
-let whitelist = ['Admin', 'Dana_mammv', 'Player_123'];
-let helloMessage = '👋 Добро пожаловать в AirbusA220KITTED!';
-
-function loadData() {
-    try {
-        const saved = localStorage.getItem('airbus_whitelist_data');
-        if (saved) {
-            const data = JSON.parse(saved);
-            notifications = data.notifications || [];
-            whitelist = data.whitelist || ['Admin'];
-            helloMessage = data.helloMessage || '👋 Добро пожаловать в AirbusA220KITTED!';
-        }
-    } catch(e) {}
-}
-
-function saveData() {
-    localStorage.setItem('airbus_whitelist_data', JSON.stringify({
-        notifications,
-        whitelist,
-        helloMessage
-    }));
-}
-
-loadData();
-
-// ============================================
-// ПОКАЗ УВЕДОМЛЕНИЯ
-// ============================================
-
-function showNotification(data) {
-    const notif = {
-        id: Date.now(),
-        username: data.username || 'Unknown',
-        userId: data.userId || '0',
-        ip: data.ip || '127.0.0.1',
-        model: data.model || 'AirbusA220KITTED',
-        time: new Date().toLocaleString(),
-        isNew: true
-    };
-    notifications.unshift(notif);
-    saveData();
-    renderAll();
-    document.getElementById('statusText').textContent = '✅ Новое уведомление!';
-    setTimeout(() => {
-        document.getElementById('statusText').textContent = 'Ожидание уведомлений...';
-    }, 3000);
-}
-
-// ============================================
-// API ДЛЯ ROBLOX (POST и GET)
-// ============================================
-
-// GET - через URL параметры
-function checkURLParams() {
-    const params = new URLSearchParams(window.location.search);
-    const username = params.get('username');
-    const userId = params.get('userId');
-    const ip = params.get('ip');
-    const model = params.get('model');
-    
-    if (username) {
-        showNotification({ username, userId, ip, model });
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
-}
-
-// POST - через fetch (для Roblox)
-window.notify = function(data) {
-    showNotification(data);
-    return { success: true };
-};
-
-window.getWhitelist = function() {
-    return whitelist;
-};
-
-window.getHello = function() {
-    return { message: helloMessage };
-};
-
-// ============================================
-// ОТОБРАЖЕНИЕ
-// ============================================
-
-function renderAll() {
-    renderNotifications();
-    renderWhitelist();
-    renderHello();
-    document.getElementById('notifCount').textContent = notifications.length;
-}
-
-function renderNotifications() {
-    const container = document.getElementById('notifList');
-    if (notifications.length === 0) {
-        container.innerHTML = '<div class="empty">📭 Нет уведомлений</div>';
-        return;
-    }
-    
-    let html = '';
-    notifications.forEach((n, i) => {
-        const inWhitelist = whitelist.includes(n.username);
-        html += `
-            <div class="card new">
-                <div class="top">
-                    <span class="username">
-                        @${n.username}
-                        ${inWhitelist ? '<span class="badge">✅ Whitelist</span>' : '<span class="badge no">⚠️ Не в списке</span>'}
-                    </span>
-                    <span class="time">${n.time}</span>
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">✈️ SkyLife<span>Manager</span></div>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <span class="num" id="totalCount">0</span>
+                    <span class="label">Всего</span>
                 </div>
-                <div class="details">
-                    🚀 Скрипт запущен в Roblox Studio<br>
-                    📍 Модель: ${n.model}<br>
-                    🖥️ IP: ${n.ip}<br>
-                    🆔 UserId: ${n.userId}
+                <div class="stat-item">
+                    <span class="num" id="activeCount">0</span>
+                    <span class="label">Активных</span>
                 </div>
-                <div>
-                    <button class="btn btn-yes" onclick="handleAction(${i}, 'yes')">✅ YES</button>
-                    <button class="btn btn-no" onclick="handleAction(${i}, 'no')">❌ NO</button>
+                <div class="stat-item">
+                    <span class="num" id="expiredCount">0</span>
+                    <span class="label">Истекло</span>
+                </div>
+                <div class="stat-item">
+                    <span class="num" id="bannedCount">0</span>
+                    <span class="label">Заблокировано</span>
                 </div>
             </div>
-        `;
-    });
-    container.innerHTML = html;
-}
+        </div>
+    </header>
 
-function renderWhitelist() {
-    const container = document.getElementById('whitelistList');
-    if (whitelist.length === 0) {
-        container.innerHTML = '<span style="color:#99aabb;">Список пуст</span>';
-        return;
-    }
-    let html = '';
-    whitelist.forEach(name => {
-        html += `<span class="tag">@${name} <span class="remove" onclick="removeWhitelist('${name}')">✕</span></span>`;
-    });
-    container.innerHTML = html;
-}
+    <!-- ===== MAIN ===== -->
+    <div class="container">
 
-function renderHello() {
-    document.getElementById('helloInput').value = helloMessage;
-    document.getElementById('helloPreview').textContent = helloMessage;
-}
+        <!-- Добавление лицензии -->
+        <div class="panel">
+            <div class="panel-title">➕ Добавить лицензию</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>ID игрока (Roblox UserId)</label>
+                    <input type="number" id="playerId" placeholder="123456789">
+                </div>
+                <div class="form-group">
+                    <label>Имя игрока</label>
+                    <input type="text" id="playerName" placeholder="SkyLife_Player">
+                </div>
+                <div class="form-group">
+                    <label>Срок (дней)</label>
+                    <input type="number" id="expiryDays" value="365" min="1">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-success" onclick="addLicense()">➕ Создать</button>
+                </div>
+            </div>
+            <div class="key-display" id="keyDisplay">
+                <button class="copy-btn" onclick="copyKey()">📋 Копировать</button>
+                <span id="keyText"></span>
+            </div>
+        </div>
 
-// ============================================
-// ДЕЙСТВИЯ
-// ============================================
+        <!-- Поиск -->
+        <div class="panel">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="🔍 Поиск по ID, имени или ключу..." oninput="filterTable()">
+                <select id="statusFilter" onchange="filterTable()">
+                    <option value="all">Все статусы</option>
+                    <option value="active">✅ Активные</option>
+                    <option value="inactive">⏸ Неактивные</option>
+                    <option value="expired">⏰ Истекшие</option>
+                    <option value="banned">🚫 Заблокированные</option>
+                </select>
+                <button class="btn btn-primary" onclick="refreshData()">🔄 Обновить</button>
+                <button class="btn btn-outline" onclick="exportData()">📤 Экспорт</button>
+            </div>
 
-function handleAction(index, action) {
-    const notif = notifications[index];
-    if (!notif) return;
-    
-    if (action === 'yes') {
-        if (!whitelist.includes(notif.username)) {
-            whitelist.push(notif.username);
-            saveData();
+            <!-- Таблица -->
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Игрок</th>
+                            <th>Лицензионный ключ</th>
+                            <th>Статус</th>
+                            <th>Создана</th>
+                            <th>Истекает</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="licensesTable">
+                        <tr><td colspan="7" style="text-align:center;color:#4a5070;padding:50px;">Загрузка данных...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== TOASTS ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ===== SCRIPT ===== -->
+    <script>
+        // =====================================================
+        // КОНФИГУРАЦИЯ
+        // =====================================================
+        // !!! ЗАМЕНИ НА СВОЙ DEPLOYMENT ID ОТ GOOGLE APPS SCRIPT !!!
+        const DEPLOYMENT_ID = 'AKfycbz1Q7Qf2S4hHlCjZxjDz4R8fQ6nH3iG2QmJ7N9P0oM4L';
+        const API_URL = 'https://script.google.com/macros/s/' + DEPLOYMENT_ID + '/exec';
+
+        let licenses = [];
+        let generatedKey = '';
+
+        // =====================================================
+        // ЗАГРУЗКА
+        // =====================================================
+        async function loadLicenses() {
+            try {
+                const res = await fetch(API_URL + '?action=getAll');
+                const data = await res.json();
+
+                if (data.success) {
+                    licenses = data.data || [];
+                    renderTable(licenses);
+                    updateStats(licenses);
+                } else {
+                    showToast('❌ ' + (data.error || 'Ошибка загрузки'), 'error');
+                }
+            } catch (e) {
+                showToast('❌ Ошибка соединения с сервером', 'error');
+                console.error(e);
+            }
         }
-        alert(`✅ ${notif.username} добавлен в whitelist!\n\n📊 Данные:\n👤 ${notif.username}\n🆔 ${notif.userId}\n🌐 ${notif.ip}`);
-    } else {
-        alert(`❌ Доступ отклонён для ${notif.username}!\n\n🧹 Все скрипты удалены из модели.`);
-    }
-    
-    notif.isNew = false;
-    saveData();
-    renderAll();
-}
 
-function addWhitelist() {
-    const input = document.getElementById('whitelistInput');
-    const name = input.value.trim();
-    if (!name) return alert('Введите имя пользователя!');
-    if (whitelist.includes(name)) return alert(`${name} уже в whitelist!`);
-    whitelist.push(name);
-    saveData();
-    renderAll();
-    input.value = '';
-    alert(`✅ ${name} добавлен в whitelist!`);
-}
+        // =====================================================
+        // ОТРИСОВКА
+        // =====================================================
+        function renderTable(data) {
+            const tbody = document.getElementById('licensesTable');
 
-function removeWhitelist(name) {
-    if (!confirm(`Удалить ${name} из whitelist?`)) return;
-    whitelist = whitelist.filter(n => n !== name);
-    saveData();
-    renderAll();
-}
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#4a5070;padding:40px;">📭 Нет лицензий</td></tr>`;
+                return;
+            }
 
-function updateHello() {
-    const input = document.getElementById('helloInput');
-    document.getElementById('helloPreview').textContent = input.value || '👋 Добро пожаловать!';
-}
+            tbody.innerHTML = data.map(l => `
+                <tr>
+                    <td style="font-size:12px;color:#8892b0;">${l.id || '-'}</td>
+                    <td>
+                        <strong>${l.playerName || 'Unknown'}</strong>
+                        <br><span style="color:#4a5070;font-size:12px;">ID: ${l.playerId}</span>
+                    </td>
+                    <td style="font-family:monospace;font-size:13px;color:#00d4ff;">
+                        ${l.licenseKey || '-'}
+                    </td>
+                    <td>
+                        <span class="badge badge-${l.status}">
+                            ${l.status === 'active' ? '✅ Активна' :
+                              l.status === 'inactive' ? '⏸ Неактивна' :
+                              l.status === 'expired' ? '⏰ Истекла' :
+                              l.status === 'banned' ? '🚫 Заблокирована' : l.status}
+                        </span>
+                    </td>
+                    <td style="font-size:13px;color:#8892b0;">${l.createdAt || '-'}</td>
+                    <td style="font-size:13px;color:#8892b0;">${l.expiresAt || '-'}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="toggleLicense('${l.id}')">
+                            ${l.status === 'active' ? '⏸' : '▶'}
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteLicense('${l.id}')">🗑</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
 
-function saveHello() {
-    const input = document.getElementById('helloInput');
-    helloMessage = input.value || '👋 Добро пожаловать!';
-    saveData();
-    renderHello();
-    alert('✅ Приветствие сохранено!');
-}
+        // =====================================================
+        // СТАТИСТИКА
+        // =====================================================
+        function updateStats(data) {
+            document.getElementById('totalCount').textContent = data.length;
+            document.getElementById('activeCount').textContent = data.filter(l => l.status === 'active').length;
+            document.getElementById('expiredCount').textContent = data.filter(l => l.status === 'expired').length;
+            document.getElementById('bannedCount').textContent = data.filter(l => l.status === 'banned').length;
+        }
 
-function clearAll() {
-    if (!confirm('Удалить все уведомления?')) return;
-    notifications = [];
-    saveData();
-    renderAll();
-}
+        // =====================================================
+        // ФИЛЬТРАЦИЯ
+        // =====================================================
+        function filterTable() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
 
-// ============================================
-// ИНИЦИАЛИЗАЦИЯ
-// ============================================
+            const filtered = licenses.filter(l => {
+                const match = (l.playerId && l.playerId.toString().includes(search)) ||
+                              (l.playerName && l.playerName.toLowerCase().includes(search)) ||
+                              (l.licenseKey && l.licenseKey.toLowerCase().includes(search));
+                const matchStatus = status === 'all' || l.status === status;
+                return match && matchStatus;
+            });
 
-checkURLParams();
-renderAll();
+            renderTable(filtered);
+        }
 
-console.log('[CRACKED] Сайт загружен!');
-console.log('[CRACKED] Whitelist:', whitelist);
-console.log('[CRACKED] Для отправки уведомления используй:');
-console.log('[CRACKED] window.notify({ username: "Name", userId: "123", ip: "1.1.1.1" })');
-</script>
+        // =====================================================
+        // ДОБАВЛЕНИЕ
+        // =====================================================
+        async function addLicense() {
+            const playerId = document.getElementById('playerId').value.trim();
+            const playerName = document.getElementById('playerName').value.trim() || 'Player_' + playerId;
+            const expiryDays = parseInt(document.getElementById('expiryDays').value) || 365;
+
+            if (!playerId) {
+                showToast('❌ Введите ID игрока!', 'error');
+                return;
+            }
+
+            const licenseKey = generateKey(playerId);
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'add',
+                        playerId: parseInt(playerId),
+                        playerName: playerName,
+                        licenseKey: licenseKey,
+                        expiryDays: expiryDays
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    generatedKey = licenseKey;
+                    document.getElementById('keyText').textContent = '🔑 ' + licenseKey;
+                    document.getElementById('keyDisplay').style.display = 'block';
+
+                    document.getElementById('playerId').value = '';
+                    document.getElementById('playerName').value = '';
+
+                    showToast('✅ Лицензия создана!', 'success');
+                    loadLicenses();
+
+                    // Автоматически скопировать
+                    navigator.clipboard?.writeText(licenseKey);
+                } else {
+                    showToast('❌ ' + (data.error || 'Ошибка'), 'error');
+                }
+            } catch (e) {
+                showToast('❌ Ошибка соединения', 'error');
+                console.error(e);
+            }
+        }
+
+        // =====================================================
+        // ГЕНЕРАЦИЯ КЛЮЧА
+        // =====================================================
+        function generateKey(playerId) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const parts = [];
+            for (let i = 0; i < 4; i++) {
+                let part = '';
+                for (let j = 0; j < 4; j++) {
+                    part += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                parts.push(part);
+            }
+            const hash = (playerId * 9301 + 49297) % 233280;
+            const check = String.fromCharCode(65 + (hash % 26));
+            return 'SKY-' + parts.join('-') + '-' + check;
+        }
+
+        // =====================================================
+        // КОПИРОВАТЬ
+        // =====================================================
+        function copyKey() {
+            const text = document.getElementById('keyText').textContent.replace('🔑 ', '');
+            navigator.clipboard?.writeText(text);
+            showToast('📋 Ключ скопирован!', 'success');
+        }
+
+        // =====================================================
+        // ИЗМЕНЕНИЕ СТАТУСА
+        // =====================================================
+        async function toggleLicense(id) {
+            if (!confirm('Изменить статус лицензии?')) return;
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'toggle', id: id })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast('✅ Статус изменён', 'success');
+                    loadLicenses();
+                } else {
+                    showToast('❌ ' + (data.error || 'Ошибка'), 'error');
+                }
+            } catch (e) {
+                showToast('❌ Ошибка соединения', 'error');
+            }
+        }
+
+        // =====================================================
+        // УДАЛЕНИЕ
+        // =====================================================
+        async function deleteLicense(id) {
+            if (!confirm('🗑 Удалить лицензию навсегда?')) return;
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'delete', id: id })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast('🗑 Лицензия удалена', 'success');
+                    loadLicenses();
+                } else {
+                    showToast('❌ ' + (data.error || 'Ошибка'), 'error');
+                }
+            } catch (e) {
+                showToast('❌ Ошибка соединения', 'error');
+            }
+        }
+
+        // =====================================================
+        // ОБНОВЛЕНИЕ
+        // =====================================================
+        function refreshData() {
+            loadLicenses();
+            showToast('🔄 Данные обновлены', 'info');
+        }
+
+        // =====================================================
+        // ЭКСПОРТ
+        // =====================================================
+        function exportData() {
+            const data = licenses.map(l => ({
+                id: l.id,
+                playerId: l.playerId,
+                playerName: l.playerName,
+                licenseKey: l.licenseKey,
+                status: l.status,
+                createdAt: l.createdAt,
+                expiresAt: l.expiresAt
+            }));
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'skylife_licenses_' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('📤 Экспорт выполнен', 'success');
+        }
+
+        // =====================================================
+        // TOAST
+        // =====================================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(50px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // =====================================================
+        // ЗАПУСК
+        // =====================================================
+        loadLicenses();
+        setInterval(refreshData, 60000); // обновление каждую минуту
+    </script>
 
 </body>
 </html>
